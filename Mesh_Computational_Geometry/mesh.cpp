@@ -160,38 +160,28 @@ void Mesh::createMesh()
 
 bool Mesh::updateMesh()
 {
-    if (!faces.size()) // Si il n'y a pas encore de faces, on en crée une au hasard
+    for (int i=0; i<vertex.size(); i++)
     {
-        Face f0(0, 1, 2);
-        faces.push_back(f0);
-        vertex[0].setAFace(0);
-        vertex[1].setAFace(0);
-        vertex[2].setAFace(0);
-        std::cout << "No face : One created" << std::endl;
-    }
-    else
-    {
-        for (int i=0; i<vertex.size(); i++)
+        if (vertex[i].aFace() == -1) // Si le sommet n'est pas connecté au maillage
         {
-            if (vertex[i].aFace() == -1) // Si le sommet n'est pas connecté au maillage
+            std::cout << "Current vertice : " << i << std::endl;
+            for (int j=0; j<faces.size(); j++)
             {
-                for (int j=0; j<faces.size(); j++)
+                if (pointInTriangle(vertex[i].p(), j) >= 0)
                 {
-                    if (pointInTriangle(vertex[i].p(), j) >= 0)
-                    {
-                        divideTriangle(j, i);
-                        vertex[i].setAFace(j);
-                        legaliseEdge(j, i);
-                        legaliseEdge(faces.size()-2, i);
-                        legaliseEdge(faces.size()-1, i);
-                        return false;
-                    }
+                    divideTriangle(j, i);
+                    std::cout << faces.size() << " " << j << std::endl;
+                    vertex[i].setAFace(j);
+                    legaliseEdge(j, i);
+                    legaliseEdge(faces.size()-2, i);
+                    legaliseEdge(faces.size()-1, i);
+                    return false;
                 }
             }
         }
-        std::cout << "No more vertex to add " << std::endl;
-        return true;
     }
+    std::cout << "No more vertex to add " << std::endl;
+    return true;
 }
 
 void glVertexDraw(const Point & p) {
@@ -208,6 +198,7 @@ void Mesh::drawMesh() {
         glColor3d(i/(1.*faces.size()),i/(1.*faces.size()),i/(1.*faces.size()));
         glVertexDraw(vertex[faces[i].v2()].p());
         glEnd();
+
         /*glBegin(GL_LINE_LOOP);
             glVertexDraw(vertex[faces[i].v0()].p());
             glVertexDraw(vertex[faces[i].v1()].p());
@@ -365,6 +356,20 @@ void Mesh::divideTriangle(uint indexTriangle, uint newVertice)
     vertex[v1].setAFace(indexTriangle);
     vertex[v2].setAFace(faces.size()-1);
     vertex[newVertice].setAFace(indexTriangle);
+
+    if (f1 != -1 && faces[f1].f0() == indexTriangle)
+        faces[f1].setf0(faces.size()-1);
+    else if (f1 != -1 && faces[f1].f1() == indexTriangle)
+        faces[f1].setf1(faces.size()-1);
+    else if (f1 != -1)
+        faces[f1].setf2(faces.size()-1);
+
+    if (f0 != -1 && faces[f0].f0() == indexTriangle)
+        faces[f0].setf0(faces.size()-2);
+    else if (f0 != -1 && faces[f0].f1() == indexTriangle)
+        faces[f0].setf1(faces.size()-2);
+    else if (f0 != -1)
+        faces[f0].setf2(faces.size()-2);
 }
 
 void Mesh::flipEdge(uint indexTriangle, uint edge)
@@ -516,6 +521,7 @@ void Mesh::legaliseEdge(uint indexTriangle, uint edge)
 
     if(isEdgeIllegal(indexTriangle, edge, fy))
     {
+        std::cout << "Need to flip edge" << indexTriangle << " " << edge << std::endl;
         flipEdge(indexTriangle, edge);
         legaliseEdge(indexTriangle, edge);
         legaliseEdge(fy, edge);
