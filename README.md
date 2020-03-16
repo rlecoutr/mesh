@@ -17,8 +17,8 @@ Most of the work done will be in mesh.h and mesh.cpp, which are the main files f
 First are the basics for a geometric project :
 
 * Definition of a point and the operators linked (scalar and vectorial products, norm, phi function, ...)
-* Defition of a vertice in a mesh (Point linked, adjacent face, index in the global vector, ...)
-* Defition of a face in a mesh (Vertices linked, adjacent faces, area, ...)
+* Definition of a vertice in a mesh (Point linked, adjacent face, index in the global vector, ...)
+* Definition of a face in a mesh (Vertices linked, adjacent faces, area, ...)
 
 ### Iterators and circulators
 
