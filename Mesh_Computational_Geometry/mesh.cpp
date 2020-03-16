@@ -164,13 +164,11 @@ bool Mesh::updateMesh()
     {
         if (vertex[i].aFace() == -1) // Si le sommet n'est pas connecté au maillage
         {
-            std::cout << "Current vertice : " << i << std::endl;
             for (int j=0; j<faces.size(); j++)
             {
                 if (pointInTriangle(vertex[i].p(), j) >= 0)
                 {
                     divideTriangle(j, i);
-                    std::cout << faces.size() << " " << j << std::endl;
                     vertex[i].setAFace(j);
                     legaliseEdge(j, i);
                     legaliseEdge(faces.size()-2, i);
@@ -521,7 +519,6 @@ void Mesh::legaliseEdge(uint indexTriangle, uint edge)
 
     if(isEdgeIllegal(indexTriangle, edge, fy))
     {
-        std::cout << "Need to flip edge" << indexTriangle << " " << edge << std::endl;
         flipEdge(indexTriangle, edge);
         legaliseEdge(indexTriangle, edge);
         legaliseEdge(fy, edge);
